@@ -61,10 +61,18 @@ Run from the repository root. Each step loads its own packages, sources
 | 1 | `1_MAKE_fit_models.R` | `data/wtp_data.csv`, 3 Stan programs | `data/posterior_{base,latent,latent_pred}.RDS` (not in git) | minutes |
 | 2 | `2_MAKE_figures.R` | step 1 output | `figures/{base,predictors,latent}.pdf` | seconds |
 | 3 | `3_MAKE_model_comparison.R` | step 1 output | `data/model_comparison.csv`, `data/rank1_summary.csv`, `figures/{rank1_share,rq3}.pdf` | seconds |
-| 4 | `4_MAKE_si_validation_sweep.R` | 2 Stan programs (all data simulated) | `si_output/sweep_results.{csv,rds}`, `si_output/fig{1,2,3}_*.png` | hours (33 cells x 2 models) |
+| 4 | `4_MAKE_si_validation_sweep.R` | 2 Stan programs (all data simulated) | `si_output/sweep_results.{csv,rds}`, `si_output/fig{1,2,3}_*.png` | days (30 cells x 2 models; see below) |
 
-Steps 1–3 are the main text. Step 4 is the supplement and is independent of the
-data — it simulates everything it needs.
+Steps 1–3 are the main text and finish in about a minute together. Step 4 is
+the supplement and is independent of the data — it simulates everything it
+needs.
+
+Step 4 is by far the expensive part and runs the cells sequentially. One cell
+at lambda = 0.5, N = 250 takes about 45 minutes (roughly 10 minutes for the
+latent model and 35 for the MVN benchmark, which is the slower of the two), and
+cost grows with N. The full 10 x 3 grid is therefore a one- to two-day run on a
+single machine. Do a `WTP_TEST=1` pass first, and consider trimming `N_GRID` in
+`code/si_validation_sweep.R` if you only need the shape of the crossover.
 
 Full settings for every fit of the three main models: 4 chains, 250 warmup and
 250 sampling iterations (`code/functions/utility.R`). The sweep uses 500/500.
