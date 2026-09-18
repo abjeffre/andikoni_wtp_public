@@ -19,6 +19,22 @@ attribution, non-commercial, no redistribution of modified versions. Both are in
 [LICENSE](LICENSE). Please cite the paper; `CITATION.cff` carries the reference
 in machine-readable form.
 
+## Quick start
+
+Install the packages listed under *Software*, then from the repository root:
+
+```
+# a fast end-to-end check (minutes)
+WTP_TEST=1 Rscript --vanilla 0_RUN_ALL.R
+
+# the paper's settings
+Rscript --vanilla 0_RUN_ALL.R
+```
+
+That is the whole pipeline: it fits the models, writes the figures and writes
+the comparison tables. Each step can also be run on its own, by name, in the
+order below.
+
 ## What is here
 
 | Path | Contents |
@@ -30,7 +46,7 @@ in machine-readable form.
 | `code/functions/utility.R` | Shared helpers, and the one place the sampler settings and test-mode switch are defined. |
 | `code/si_validation_sweep.R` | The supplementary simulation study, driven by step 4. |
 | `data/wtp_data.csv` | The analysis dataset: 71 respondents, 7 columns (see *Data*). |
-| `data/CODEBOOK.md` | Variable definitions, elicitation, corrections, and what was removed for release. |
+| `data/CODEBOOK.md` | Variable definitions, the elicitation procedure, and what was removed for release. |
 | `data/data_dictionary.csv` | One row per column: type, unit, meaning, observed range. |
 | `figures/` | The paper's figures as produced by the pipeline on our machine, for comparison with your own run. |
 | `LICENSE`, `CITATION.cff` | Terms of reuse and the reference to cite. |
@@ -53,21 +69,12 @@ data — it simulates everything it needs.
 Full settings for every fit of the three main models: 4 chains, 250 warmup and
 250 sampling iterations (`code/functions/utility.R`). The sweep uses 500/500.
 
-### Running
-
-```
-Rscript --vanilla 0_RUN_ALL.R
-```
-
-That is the whole pipeline. To run a single step instead, run it by name from
-the repository root — each is self-contained.
-
-### Test run first
+### Test mode
 
 `WTP_TEST=1` runs everything in minutes: every model uses 20 warmup and 20
-sampling iterations and the sweep keeps only its corner cells. This proves
-every path, file and figure on your machine; the posteriors it produces are
-meaningless. Unset it for the paper's settings.
+sampling iterations and the sweep keeps only its corner cells. It proves every
+path, file and figure on your machine; the posteriors it produces are not
+interpretable. Unset it for the paper's settings.
 
 ```
 # bash / zsh
@@ -117,55 +124,22 @@ introduced; it falls back to row names on older versions.
 
 ## Data
 
-`data/wtp_data.csv` holds 71 respondents and 7 columns. `data/CODEBOOK.md`
-documents each one, together with the elicitation procedure and the two rounds
-of corrections applied to the wealth variable.
+`data/wtp_data.csv` holds 71 respondents and 7 columns.
+[`data/CODEBOOK.md`](data/CODEBOOK.md) documents each column, the elicitation
+procedure, and how the file was de-identified. `data/data_dictionary.csv` gives
+the same column list in machine-readable form.
 
-### De-identification and residual risk
+The release is pseudonymous rather than anonymous: names and the panel and
+household identifiers are absent, but the respondents are not k-anonymous on
+`{sex, marital status, age, education}`, because coarsening those variables
+would prevent the published results from reproducing. The codebook states the
+limit in full; respect it if you redistribute or link the file.
 
-The source workbook contains respondent **names**, an individual panel
-identifier (`PE`) whose prefix also encodes the household, and a household
-identifier (`PESU2018`). None of these are in this repository, in any form, at
-any point in its history. Row order was randomised under a fixed seed, because
-in the source workbook rows are sorted by `PE` and `PE` order is alphabetical by
-name, so row position alone was identifying.
+## Note on the model comparison
 
-**This release is pseudonymous, not anonymous, and we state the limit plainly.**
-Across the quasi-identifiers `{sex, marital status, age, education}` the 71
-respondents fall into 61 distinct combinations: 53 respondents are unique on
-those four variables, and every respondent is in a class of fewer than five.
-Anyone who already knows a participant's age, sex, marital status and schooling
-could likely locate their row and read off their wealth and their two bids. We
-judged this acceptable because coarsening age and wealth — the two continuous
-model predictors — would prevent the published results from reproducing, and
-because the study population is not identified at village level in the paper.
-If you intend to redistribute or link this file, that is the constraint to
-respect.
-
-## Known issues
-
-Three points where the code as published departs from what was probably
-intended. All three are carried over **verbatim** from the original analysis
-script so that this repository reproduces the published numbers; each is marked
-`# FLAGGED` at its location.
-
-1. **Third panel of `figures/predictors.pdf`** (`2_MAKE_figures.R`). The
-   education and wealth rows of the "Contrasts (Comm − Priv)" panel index
-   `post$bE[2]` and `post$bW[2]` without a comma, so a single posterior draw is
-   recycled instead of the second outcome's column (`post$bE[, 2]`). The three
-   rows above them use `[, 2]` as intended.
-2. **MVN residual reconstruction** (`extract_mu_residuals` in
-   `code/functions/utility.R`). The linear predictor is rebuilt from `a`, `bW`,
-   `bA` and `bA2` only; `base_model.stan` also contains a sex effect and an
-   education effect, which therefore remain in the residuals.
-3. **Rank-1 share** (`3_MAKE_model_comparison.R`). The originally reported
-   statistic pairs the MVN private residual with the *latent* community
-   residual. The step now also prints both within-model pairs alongside it.
-
-A fourth, more consequential point concerns the supplement. The latent model's
-`log_lik` is conditional on the per-person latent `T_i`, which biases a
-person-level LOO comparison toward the latent model. Step 4 therefore sets
+The latent model's `log_lik` is conditional on the per-person latent `T_i`,
+which biases a person-level LOO comparison toward the latent model. Step 4 sets
 `RECOMPUTE_MARGINAL_LL = TRUE` and rebuilds the marginal per-person log
 likelihood in R from the posterior draws. The same caveat applies to the LOO
-table written by step 3, which is reported as a descriptive summary rather than
-a model-selection criterion.
+table written by step 3, which is a descriptive summary rather than a
+model-selection criterion.
