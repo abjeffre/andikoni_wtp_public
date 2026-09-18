@@ -1,0 +1,8 @@
+"element","type","unit","label","stan_transform","observed_min","observed_median","observed_max","file"
+"priv_price","numeric","TSh","Willingness to pay for tree planting on private land (binafsi); highest accepted bid, inclusive of uncertain answers.","log1p -> priv","2000","75000","1000000","data/wtp_data.csv"
+"pub_price","numeric","TSh","Willingness to pay for tree planting on community land (jamii); highest accepted bid, inclusive of uncertain answers.","log1p -> pub","1000","75000","500000","data/wtp_data.csv"
+"sex","character","","Respondent sex, M or F.","factor -> 1..2 index","F; M","","","data/wtp_data.csv"
+"ms","character","","Marital status as recorded in the household survey.","not used by the models","married; unmarried","","","data/wtp_data.csv"
+"age","numeric","years","Age in 2023, derived from birth year only.","standardized","23","38","68","data/wtp_data.csv"
+"ed_rev","numeric","years","Completed years of education (revised).","factor -> 1..K index","0","0","13","data/wtp_data.csv"
+"wealth","numeric","TSh","Total household wealth in 2023, corrected for polygynous sharing-unit attribution.","standardize(log1p) -> wealth","6810000","19391500","88502500","data/wtp_data.csv"

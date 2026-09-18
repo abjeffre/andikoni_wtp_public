@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite the paper below."
+title: "andikoni_wtp_public: replication code and data for the Andikoni willingness-to-pay study"
+type: software
+repository-code: "https://github.com/abjeffre/andikoni_wtp_public"   # TODO confirm
+license:
+  - MIT
+  - CC-BY-NC-ND-4.0
+authors:
+  - family-names: Andrews
+    given-names: Jeffrey
+    email: jeffrey_andrews@eva.mpg.de
+    affiliation: "Max Planck Institute for Evolutionary Anthropology"
+  # TODO add the remaining co-authors, in the paper's author order
+preferred-citation:
+  type: article
+  title: "TODO paper title"
+  journal: "TODO journal"
+  year: 2026            # TODO
+  doi: "TODO"
+  authors:
+    - family-names: Andrews
+      given-names: Jeffrey
+    # TODO add the remaining co-authors, in the paper's author order
